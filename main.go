@@ -1,9 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
 
 func main() {
 
-	fmt.Printf("toto")
-
+	r := mux.NewRouter()
+	r.HandleFunc("/", checkMethod)
+	err := http.ListenAndServe(":8080", r)
+	if err != nil {
+		panic(err)
+	}
 }

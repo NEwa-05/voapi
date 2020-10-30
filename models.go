@@ -1,16 +1,9 @@
 package main
 
-//Requests structure
-type Requests struct {
-	Request string `json:"request"`
+type request struct {
+	Text string `json:"text"`
 }
 
-//Replies structure
-type Replies struct {
-	Reply string `json:"reply"`
+type response struct {
+	Text string `json:"text"`
 }
-
-//var replies []Replies = []Replies{}
-var requests = []Requests{{"2021"}, {"2022"}}
-
-var replies = []Replies{{"fire"}, {"pandemic"}}

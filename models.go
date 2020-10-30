@@ -9,3 +9,8 @@ type Requests struct {
 type Replies struct {
 	Reply string `json:"reply"`
 }
+
+//var replies []Replies = []Replies{}
+var requests = []Requests{{"2021"}, {"2022"}}
+
+var replies = []Replies{{"fire"}, {"pandemic"}}

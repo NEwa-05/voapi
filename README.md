@@ -1,8 +1,8 @@
-# Voice Over Api :D
+# Voice Over API :D
 
 Will be based on Alexa Skills
 
-## what we need : 
+## what we need
 
 Only HTTP GET
 
@@ -12,12 +12,11 @@ parse
 
 Reply Message json format
 
-
-## tools to test api: 
+## tools to test api
 
 ngrok (tunnel https  to local http)  get from site and use by :
 
-ngrok http port 
+ngrok http port
 
 postman (api comm to replace curl)
 

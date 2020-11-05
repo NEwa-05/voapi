@@ -9,8 +9,8 @@ import (
 func main() {
 
 	r := mux.NewRouter()
-	r.HandleFunc("/alpha/years", getYears).Methods("POST")
 	r.HandleFunc("/alpha/events", getEvents).Methods("POST")
+	r.HandleFunc("/alpha/alexa", helloAlexa).Methods("POST")
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		panic(err)

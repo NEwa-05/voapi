@@ -20,11 +20,11 @@ type backendResponse struct {
 		Key string `json:"key,omitempty"`
 	} `json:"sessionAttributes,omitempty"`
 	Response struct {
-		OutputSpeech outputSpeech `json:"outputSpeech,omitempty"`
-		//Card             card         `json:"card,omitempty"`
-		//Reprompt         reprompt     `json:"reprompt,omitempty"`
-		Directives       []directives `json:"directives,omitempty"`
-		ShouldEndSession bool         `json:"shoulEndSession,omitempty"`
+		OutputSpeech     outputSpeech  `json:"outputSpeech,omitempty"`
+		Card             *card         `json:"card,omitempty"`
+		Reprompt         *reprompt     `json:"reprompt,omitempty"`
+		Directives       *[]directives `json:"directives,omitempty"`
+		ShouldEndSession bool          `json:"shoulEndSession,omitempty"`
 	} `json:"response"`
 }
 

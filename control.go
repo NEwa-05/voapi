@@ -56,11 +56,13 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 	var alexaResponse backendResponse
 
 	if alexaLaunchRequest.Request.Type == "LaunchRequest" {
+
 		alexaResponse.Version = "1.0"
 		alexaResponse.Response.OutputSpeech.Type = "PlainText"
-		alexaResponse.Response.OutputSpeech.Text = "Bonjour Humain"
+		alexaResponse.Response.OutputSpeech.Text = "Bonjour, Humain !"
 		alexaResponse.Response.ShouldEndSession = true
 		alexaResponseByte, err := json.Marshal(alexaResponse)
+
 		if err != nil {
 			log.Print(err)
 		}

@@ -46,27 +46,49 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Print(err)
-	}
-	var alexaLaunchRequest launchRequest
-	err = json.Unmarshal(body, &alexaLaunchRequest)
+	} /*
+		var alexaLaunchRequest launchRequest
+		err = json.Unmarshal(body, &alexaLaunchRequest)
+		if err != nil {
+			log.Print(err)
+		}
+
+		var alexaResponse backendResponse
+
+		if alexaLaunchRequest.Request.Type == "LaunchRequest" { */
+	var alexaResponse backendResponse
+	err = json.Unmarshal(body, &alexaResponse)
 	if err != nil {
 		log.Print(err)
 	}
 
-	var alexaResponse backendResponse
-
-	if alexaLaunchRequest.Request.Type == "LaunchRequest" {
-
+	if alexaResponse.Request.Type == "LaunchRequest" {
 		alexaResponse.Version = "1.0"
 		alexaResponse.Response.OutputSpeech.Type = "PlainText"
 		alexaResponse.Response.OutputSpeech.Text = "Bonjour, Humain !"
-		alexaResponse.Response.ShouldEndSession = true
+		alexaResponse.Response.ShouldEndSession = false
 		alexaResponseByte, err := json.Marshal(alexaResponse)
 
 		if err != nil {
 			log.Print(err)
 		}
 		w.Write(alexaResponseByte)
+
+	} else if alexaResponse.Request.Type == "IntentRequest" {
+		switch intent := alexaResponse.Request.Intent.Name; intent {
+		case "DoomPrediction":
+			alexaResponse.Version = "1.0"
+			alexaResponse.Response.OutputSpeech.Type = "PlainText"
+			alexaResponse.Response.OutputSpeech.Text = "En 2020, forme de vie inferieur"
+			alexaResponse.Response.ShouldEndSession = true
+			alexaResponseByte, err := json.Marshal(alexaResponse)
+
+			if err != nil {
+				log.Print(err)
+			}
+
+			w.Write(alexaResponseByte)
+		}
 	} else {
 		alexaResponse.Version = "1.0"
 		alexaResponse.Response.OutputSpeech.Type = "PlainText"

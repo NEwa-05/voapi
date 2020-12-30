@@ -26,6 +26,16 @@ type backendResponse struct {
 		Directives       *[]directives `json:"directives,omitempty"`
 		ShouldEndSession bool          `json:"shoulEndSession,omitempty"`
 	} `json:"response"`
+	Request struct {
+		Type        string  `json:"type,omitempty"`
+		RequestID   string  `json:"requestId,omitempty"`
+		Timestamp   string  `json:"timestamp,omitempty"`
+		DialogState string  `json:"dialogState,omitempty"`
+		Locale      string  `json:"locale,omitempty"`
+		Intent      *intent `json:"intent,omitempty"`
+		Reason      string  `json:"reason,omitempty"`
+		Error       *Error  `json:"error,omitempty"`
+	} `json:"request"`
 }
 
 type outputSpeech struct {
@@ -50,4 +60,16 @@ type card struct {
 		SmallImageURL string `json:"smallImageUrl,omitempty"`
 		LargeImageURL string `json:"largeImageUrl,omitempty"`
 	} `json:"image,omitempty"`
+}
+
+type intent struct {
+	Name               string                 `json:"name"`
+	ConfirmationStatus string                 `json:"confirmationStatus,omitempty"`
+	Slots              map[string]interface{} `json:"slots,omitempty"`
+}
+
+// Error ...
+type Error struct {
+	Type    string `json:"type,omitempty"`
+	Message string `json:"message,omitempty"`
 }

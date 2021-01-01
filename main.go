@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-
+	callswapi()
 	r := mux.NewRouter()
 	r.HandleFunc("/alpha/events", getEvents).Methods("POST")
 	r.HandleFunc("/alpha/alexa", helloAlexa).Methods("POST")
@@ -15,4 +15,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 }

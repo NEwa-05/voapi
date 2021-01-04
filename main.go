@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -25,8 +26,8 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 	if alexaResponse.Request.Type == "LaunchRequest" {
 		alexaResponse.Version = "1.0"
 		alexaResponse.Response.OutputSpeech.Type = "PlainText"
-		alexaResponse.Response.OutputSpeech.Text = "Bonjour, Humain !"
-		alexaResponse.Response.ShouldEndSession = false
+		alexaResponse.Response.OutputSpeech.Text = "The dark side is full of informations"
+		alexaResponse.Response.ShouldEndSession = true
 		alexaResponseByte, err := json.Marshal(alexaResponse)
 
 		if err != nil {
@@ -35,35 +36,65 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 		w.Write(alexaResponseByte)
 
 	} else if alexaResponse.Request.Type == "IntentRequest" {
-		if alexaResponse.Request.Intent.Name == "DoomPrediction" {
+		if alexaResponse.Request.Intent.Name == "int_sw_people_selection" {
+			for key := range alexaResponse.Request.Intent.Slots {
+				var newSlot Slot
+				s, err := json.Marshal(alexaResponse.Request.Intent.Slots[key])
+				if err != nil {
+					fmt.Print("can not marshal")
+				}
+				err = json.Unmarshal(s, &newSlot)
+				if err != nil {
+					fmt.Print("can not unmarshal new value")
+				}
+				if newSlot.Resolutions != nil {
+					if key == "sltype_sw_people_name" {
+						alexaResponse.Version = "1.0"
+						alexaResponse.Response.OutputSpeech.Type = "PlainText"
+						alexaResponse.Response.OutputSpeech.Text = "Luke"
+						alexaResponse.Response.ShouldEndSession = true
+						alexaResponseByte, err := json.Marshal(alexaResponse)
+						if err != nil {
+							log.Print(err)
+						}
 
-			alexaResponse.Version = "1.0"
-			alexaResponse.Response.OutputSpeech.Type = "PlainText"
-			alexaResponse.Response.OutputSpeech.Text = "En 2020, forme de vie inferieur"
-			alexaResponse.Response.ShouldEndSession = true
-			alexaResponseByte, err := json.Marshal(alexaResponse)
-
-			if err != nil {
-				log.Print(err)
+						w.Write(alexaResponseByte)
+					}
+				}
 			}
+		} else if alexaResponse.Request.Intent.Name == "int_sw_people_info" {
+			for key := range alexaResponse.Request.Intent.Slots {
+				var newSlot Slot
+				s, err := json.Marshal(alexaResponse.Request.Intent.Slots[key])
+				if err != nil {
+					fmt.Print("can not marshal")
+				}
+				err = json.Unmarshal(s, &newSlot)
+				if err != nil {
+					fmt.Print("can not unmarshal new value")
+				}
+				if newSlot.Resolutions != nil {
+					if key == "sltype_sw_people_haircolor" {
+						alexaResponse.Version = "1.0"
+						alexaResponse.Response.OutputSpeech.Type = "PlainText"
+						alexaResponse.Response.OutputSpeech.Text = "blond"
+						alexaResponse.Response.ShouldEndSession = true
+						alexaResponseByte, err := json.Marshal(alexaResponse)
+						if err != nil {
+							log.Print(err)
+						}
 
-			w.Write(alexaResponseByte)
+						w.Write(alexaResponseByte)
+
+					}
+
+				}
+			}
 		}
-	} else {
-		alexaResponse.Version = "1.0"
-		alexaResponse.Response.OutputSpeech.Type = "PlainText"
-		alexaResponse.Response.OutputSpeech.Text = "Je n'ai pas compris"
-		alexaResponse.Response.ShouldEndSession = true
-		alexaResponseByte, err := json.Marshal(alexaResponse)
-		if err != nil {
-			log.Print(err)
-		}
-		w.Write(alexaResponseByte)
 	}
 }
 
 func main() {
-	callswapi()
 	r := mux.NewRouter()
 	r.HandleFunc("/alpha/alexa", helloAlexa).Methods("POST")
 	err := http.ListenAndServe(":8080", r)

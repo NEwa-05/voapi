@@ -32,7 +32,7 @@ type backendResponse struct {
 		Timestamp   string  `json:"timestamp,omitempty"`
 		DialogState string  `json:"dialogState,omitempty"`
 		Locale      string  `json:"locale,omitempty"`
-		Intent      *intent `json:"intent,omitempty"`
+		Intent      *Intent `json:"intent,omitempty"`
 		Reason      string  `json:"reason,omitempty"`
 		Error       *Error  `json:"error,omitempty"`
 	} `json:"request"`
@@ -62,13 +62,57 @@ type card struct {
 	} `json:"image,omitempty"`
 }
 
-type intent struct {
+//Intent struct
+type Intent struct {
 	Name               string                 `json:"name"`
 	ConfirmationStatus string                 `json:"confirmationStatus,omitempty"`
 	Slots              map[string]interface{} `json:"slots,omitempty"`
 }
 
-// Error ...
+//Slot struct
+type Slot struct {
+	ConfirmationStatus string       `json:"confirmationStatus,omitempty"`
+	Name               string       `json:"name,omitempty"`
+	Resolutions        *Resolutions `json:"resolutions,omitempty"`
+}
+
+//SlotName struct
+type SlotName struct {
+	Name               string       `json:"name,omitempty"`
+	Value              string       `json:"value,omitempty"`
+	ConfirmationStatus string       `json:"confirmationStatus,omitempty"`
+	Resolutions        *Resolutions `json:"resolutions,omitempty"`
+}
+
+//Resolutions struct
+type Resolutions struct {
+	ResolutionsPerAuthority []*ResolutionsPerAuthority `json:"resolutionsPerAuthority,omitempty"`
+}
+
+//ResolutionsPerAuthority struct
+type ResolutionsPerAuthority struct {
+	Authority string    `json:"authority,omitempty"`
+	Status    *Status   `json:"status,omitempty"`
+	Values    []*Values `json:"values,omitempty"`
+}
+
+//Status struct
+type Status struct {
+	Code string `json:"code,omitempty"`
+}
+
+//Values struct
+type Values struct {
+	Value *Value `json:"value,omitempty"`
+}
+
+//Value Struct
+type Value struct {
+	Name string `json:"name,omitempty"`
+	ID   string `json:"id,omitempty"`
+}
+
+// Error struct
 type Error struct {
 	Type    string `json:"type,omitempty"`
 	Message string `json:"message,omitempty"`

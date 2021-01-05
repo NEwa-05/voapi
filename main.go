@@ -6,9 +6,43 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/gorilla/mux"
 )
+
+func getSwapi(s string) (peopleInfo SearchPeople) {
+	//debug variable info
+	fmt.Printf("%s\n", s)
+
+	var peopleSearchInfo SearchPeople
+	swapiBase, err := url.Parse("https://swapi.dev/api/people/")
+	if err != nil {
+		log.Print(err)
+	}
+	params := url.Values{}
+	params.Add("search", s)
+	swapiBase.RawQuery = params.Encode()
+
+	//debug
+	fmt.Printf("%s\n", swapiBase.String())
+
+	swapiSearch, err := http.Get(swapiBase.String())
+	if err != nil {
+		log.Print(err)
+	}
+
+	err = json.NewDecoder(swapiSearch.Body).Decode(&peopleSearchInfo)
+	if err != nil {
+		log.Print(err)
+	}
+
+	//debug results
+	fmt.Printf("%s\n", peopleSearchInfo.Results[0].Name)
+
+	return peopleSearchInfo
+
+}
 
 func helloAlexa(w http.ResponseWriter, r *http.Request) {
 	// return content-type as json
@@ -51,6 +85,8 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 				}
 				if newSlot.Resolutions != nil {
 					if key == "intsl_sw_people_name" {
+						swapiInfo := getSwapi(newSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.Name)
+						fmt.Printf("%s\n", swapiInfo.Results[0].Name)
 						alexaResponse.Version = "1.0"
 						alexaResponse.Response.OutputSpeech.Type = "PlainText"
 						alexaResponse.Response.OutputSpeech.Text = "Luke you said"

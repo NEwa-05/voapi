@@ -23,11 +23,13 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 	}
 
+	fmt.Print(alexaResponse)
+
 	if alexaResponse.Request.Type == "LaunchRequest" {
 		alexaResponse.Version = "1.0"
 		alexaResponse.Response.OutputSpeech.Type = "PlainText"
 		alexaResponse.Response.OutputSpeech.Text = "The dark side is full of informations"
-		alexaResponse.Response.ShouldEndSession = true
+		alexaResponse.Response.ShouldEndSession = false
 		alexaResponseByte, err := json.Marshal(alexaResponse)
 
 		if err != nil {
@@ -48,11 +50,11 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 					fmt.Print("can not unmarshal new value")
 				}
 				if newSlot.Resolutions != nil {
-					if key == "sltype_sw_people_name" {
+					if key == "intsl_sw_people_name" {
 						alexaResponse.Version = "1.0"
 						alexaResponse.Response.OutputSpeech.Type = "PlainText"
-						alexaResponse.Response.OutputSpeech.Text = "Luke"
-						alexaResponse.Response.ShouldEndSession = true
+						alexaResponse.Response.OutputSpeech.Text = "Luke you said"
+						alexaResponse.Response.ShouldEndSession = false
 						alexaResponseByte, err := json.Marshal(alexaResponse)
 						if err != nil {
 							log.Print(err)
@@ -74,7 +76,7 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 					fmt.Print("can not unmarshal new value")
 				}
 				if newSlot.Resolutions != nil {
-					if key == "sltype_sw_people_haircolor" {
+					if key == "intsl_sw_people_haircolor" {
 						alexaResponse.Version = "1.0"
 						alexaResponse.Response.OutputSpeech.Type = "PlainText"
 						alexaResponse.Response.OutputSpeech.Text = "blond"

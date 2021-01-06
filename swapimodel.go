@@ -1,5 +1,6 @@
 package main
 
+/*
 //SearchPeople swapi struct
 type SearchPeople struct {
 	Count    int    `json:"count,omitempty"`
@@ -23,7 +24,7 @@ type SearchPeople struct {
 		Edited    string   `json:"edited,omitempty"`
 		URL       string   `json:"url,omitempty"`
 	} `json:"results,omitempty"`
-}
+} */
 
 //People swapi struct
 type People struct {

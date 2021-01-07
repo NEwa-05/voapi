@@ -47,18 +47,19 @@ func getSwapi(id, caracteristic string) (result string) {
 
 }
 
-/*
-func buildIntentResponse(name, result string) (response []byte){
-
-    constructedResponse := fmt.Sprintf("la taille de %s est de %s", name result)
-
-    alexaResponse.Version = "1.0"
-		alexaResponse.Response.OutputSpeech.Type = "PlainText"
-		alexaResponse.Response.OutputSpeech.Text = "Pose ta question et la Force te repondra"
-		alexaResponse.Response.ShouldEndSession = true
-		alexaResponseByte, err := json.Marshal(alexaResponse)
+func buildIntentResponse(response string) (alexaResponseByte []byte) {
+	var alexaResponse backendResponse
+	alexaResponse.Version = "1.0"
+	alexaResponse.Response.OutputSpeech.Type = "PlainText"
+	alexaResponse.Response.OutputSpeech.Text = fmt.Sprintf("%s", response)
+	alexaResponse.Response.ShouldEndSession = true
+	alexaResponseByte, err := json.Marshal(alexaResponse)
+	if err != nil {
+		log.Print(err)
+	}
+	return alexaResponseByte
 }
-*/
+
 func helloAlexa(w http.ResponseWriter, r *http.Request) {
 	// return content-type as json
 	w.Header().Set("Content-Type", "application/json")
@@ -73,15 +74,8 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if alexaResponse.Request.Type == "LaunchRequest" {
-		alexaResponse.Version = "1.0"
-		alexaResponse.Response.OutputSpeech.Type = "PlainText"
-		alexaResponse.Response.OutputSpeech.Text = "Pose ta question et la Force te repondra"
-		alexaResponse.Response.ShouldEndSession = true
-		alexaResponseByte, err := json.Marshal(alexaResponse)
-
-		if err != nil {
-			log.Print(err)
-		}
+		response := "Pose ta question et la Force te repondra"
+		alexaResponseByte := buildIntentResponse(response)
 		w.Write(alexaResponseByte)
 
 	} else if alexaResponse.Request.Type == "IntentRequest" {
@@ -114,64 +108,23 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 				} else if newSlot.Resolutions != nil && key == "intsl_sw_people_height" {
 
 					swapiInfo := getSwapi(SwapiInfoID, key)
-					alexaResponse.Version = "1.0"
-					alexaResponse.Response.OutputSpeech.Type = "PlainText"
-					alexaResponse.Response.OutputSpeech.Text = fmt.Sprintf("la taille de %s est de %s", SwapiInfoName, swapiInfo)
-					alexaResponse.Response.ShouldEndSession = true
-					alexaResponseByte, err := json.Marshal(alexaResponse)
-					if err != nil {
-						log.Print(err)
-
-					}
+					response := fmt.Sprintf("la taille de %s est de %s", SwapiInfoName, swapiInfo)
+					alexaResponseByte := buildIntentResponse(response)
 					w.Write(alexaResponseByte)
 				} else if newSlot.Resolutions != nil && key == "intsl_sw_people_birthdate" {
 
 					swapiInfo := getSwapi(SwapiInfoID, key)
-					alexaResponse.Version = "1.0"
-					alexaResponse.Response.OutputSpeech.Type = "PlainText"
-					alexaResponse.Response.OutputSpeech.Text = fmt.Sprintf("l'année de naissance de %s est %s", SwapiInfoName, swapiInfo)
-					alexaResponse.Response.ShouldEndSession = true
-					alexaResponseByte, err := json.Marshal(alexaResponse)
-					if err != nil {
-						log.Print(err)
-
-					}
+					response := fmt.Sprintf("l'année de naissance de %s est %s", SwapiInfoName, swapiInfo)
+					alexaResponseByte := buildIntentResponse(response)
 					w.Write(alexaResponseByte)
 				} else if newSlot.Resolutions != nil && key == "intsl_sw_people_haircolor" {
 
 					swapiInfo := getSwapi(SwapiInfoID, key)
-					alexaResponse.Version = "1.0"
-					alexaResponse.Response.OutputSpeech.Type = "PlainText"
-					alexaResponse.Response.OutputSpeech.Text = fmt.Sprintf("les cheveux de %s sont %s", SwapiInfoName, swapiInfo)
-					alexaResponse.Response.ShouldEndSession = true
-					alexaResponseByte, err := json.Marshal(alexaResponse)
-					if err != nil {
-						log.Print(err)
-
-					}
+					response := fmt.Sprintf("les cheveux de %s sont %s", SwapiInfoName, swapiInfo)
+					alexaResponseByte := buildIntentResponse(response)
 					w.Write(alexaResponseByte)
 				}
 			}
-			/*
-				if newSlot.Resolutions != nil {
-					if key == "intsl_sw_people_name" {
-						SwapiInfoName := newSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.Name
-						SwapiInfoID := newSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.ID
-					}
-					if key == "intsl_sw_people_height" {
-						swapiInfo := getSwapi(SwapiInfoID, key)
-						alexaResponse.Version = "1.0"
-						alexaResponse.Response.OutputSpeech.Type = "PlainText"
-						alexaResponse.Response.OutputSpeech.Text = fmt.Sprintf("la taille de %s est de %s", SwapiInfoName, swapiInfo)
-						alexaResponse.Response.ShouldEndSession = true
-						alexaResponseByte, err := json.Marshal(alexaResponse)
-						if err != nil {
-							log.Print(err)
-
-						}
-						w.Write(alexaResponseByte)
-					}
-				}*/
 		}
 	}
 }

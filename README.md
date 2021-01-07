@@ -1,23 +1,27 @@
 # Voice Over API :D
 
-Will be based on Alexa Skills
+Will be based on Alexa Skills and swapi.dev (Star Wars API)
 
 ## what we need
 
-Only HTTP GET
+Get request from Alexa concerning a character from Star Wars and reply to Alexa with the information found in swapi.dev
 
-Send Message json format
+Message from and to Alexa will be JSON.
 
-parse
-
-Reply Message json format
+swapi.dev parsing will be done via get request
 
 ## tools to test api
 
-ngrok (tunnel https  to local http)  get from site and use by :
+- ngrok (https://ngrok.com/) to create a redirect from an external https url to our local service
 
-ngrok http port
+usage example:
+ngrok http 8080
 
-postman (api comm to replace curl)
+- fresh (https://github.com/gravityblast/fresh) to build go code at each changes
 
-download from site, untar and star via ./Postman
+usage example:
+fresh
+
+- postman (https://www.postman.com/) to interact with api easily
+
+usage example: ./Postman

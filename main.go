@@ -135,6 +135,10 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 							alexaResponseByte := buildIntentResponse(response)
 							w.Write(alexaResponseByte)
 						}
+					default:
+						response := fmt.Sprintf("Je ne connais pas cette information à propos de %s", SwapiInfoName)
+						alexaResponseByte := buildIntentResponse(response)
+						w.Write(alexaResponseByte)
 					}
 				}
 			}

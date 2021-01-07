@@ -106,45 +106,35 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 						response := fmt.Sprintf("la taille de %s est de %s centimetres", SwapiInfoName, swapiInfo)
 						alexaResponseByte := buildIntentResponse(response)
 						w.Write(alexaResponseByte)
-						/*_, err = w.Write(alexaResponseByte)
-						if err == nil {
-							SwapiInfoName = ""
-							SwapiInfoID = ""
-						}*/
 					case "intsl_sw_people_birthdate":
 						swapiInfo := getSwapi(SwapiInfoID, key)
 						response := fmt.Sprintf("l'année de naissance de %s est %s", SwapiInfoName, swapiInfo)
 						alexaResponseByte := buildIntentResponse(response)
 						w.Write(alexaResponseByte)
-						/*_, err = w.Write(alexaResponseByte)
-						if err == nil {
-							SwapiInfoName = ""
-							SwapiInfoID = ""
-						}*/
 					case "intsl_sw_people_haircolor":
 						swapiInfo := getSwapi(SwapiInfoID, key)
 						switch swapiInfo {
-						case "n/a":
-							response := fmt.Sprintf("Les droids n'ont pas de cheveux")
-							alexaResponseByte := buildIntentResponse(response)
-							w.Write(alexaResponseByte)
 						case "brown":
-							response := fmt.Sprintf("les cheveux de %s sont brun", SwapiInfoName)
+							response := fmt.Sprintf("les cheveux de %s sont bruns", SwapiInfoName)
 							alexaResponseByte := buildIntentResponse(response)
 							w.Write(alexaResponseByte)
-
 						case "blond":
-							response := fmt.Sprintf("les cheveux de %s sont %s", SwapiInfoName, swapiInfo)
+							response := fmt.Sprintf("les cheveux de %s sont blonds", SwapiInfoName)
 							alexaResponseByte := buildIntentResponse(response)
 							w.Write(alexaResponseByte)
-
+						case "red":
+							response := fmt.Sprintf("les cheveux de %s sont roux", SwapiInfoName)
+							alexaResponseByte := buildIntentResponse(response)
+							w.Write(alexaResponseByte)
+						case "none":
+							response := fmt.Sprintf("%s n'a pas de cheveux sur le caillou", SwapiInfoName)
+							alexaResponseByte := buildIntentResponse(response)
+							w.Write(alexaResponseByte)
+						default:
+							response := fmt.Sprintf("aucune info sur les cheveux de %s", SwapiInfoName)
+							alexaResponseByte := buildIntentResponse(response)
+							w.Write(alexaResponseByte)
 						}
-						/*_, err = w.Write(alexaResponseByte)
-						if err == nil {
-							SwapiInfoName = ""
-							SwapiInfoID = ""
-						}*/
-
 					}
 				}
 			}

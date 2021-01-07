@@ -17,19 +17,15 @@ var SwapiInfoID string
 var SwapiInfoName string
 
 func getSwapi(id, caracteristic string) (result string) {
-
 	var peopleSearchInfo People
-
 	swapiSearch, err := http.Get("https://swapi.dev/api/people/" + id)
 	if err != nil {
 		log.Print(err)
 	}
-
 	err = json.NewDecoder(swapiSearch.Body).Decode(&peopleSearchInfo)
 	if err != nil {
 		log.Print(err)
 	}
-
 	switch caracteristic {
 	case "intsl_sw_people_height":
 		result := peopleSearchInfo.Height
@@ -40,11 +36,8 @@ func getSwapi(id, caracteristic string) (result string) {
 	case "intsl_sw_people_haircolor":
 		result := peopleSearchInfo.HairColor
 		return result
-
 	}
-
 	return result
-
 }
 
 func buildIntentResponse(response string) (alexaResponseByte []byte) {
@@ -72,12 +65,10 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 	}
-
 	if alexaResponse.Request.Type == "LaunchRequest" {
-		response := "Pose ta question et la Force te repondra"
+		response := "Holo disque initialisé"
 		alexaResponseByte := buildIntentResponse(response)
 		w.Write(alexaResponseByte)
-
 	} else if alexaResponse.Request.Type == "IntentRequest" {
 		if alexaResponse.Request.Intent.Name == "int_sw_people" {
 
@@ -91,38 +82,70 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 				if err != nil {
 					fmt.Print("can not unmarshal new value")
 				}
-
-				if key == "intsl_sw_people_name" {
-					var nameSlot Slot
-					s, err := json.Marshal(alexaResponse.Request.Intent.Slots[key])
-					if err != nil {
-						fmt.Print("can not marshal")
+				if newSlot.Resolutions != nil {
+					if key == "intsl_sw_people_name" {
+						SwapiInfoName = newSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.Name
+						SwapiInfoID = newSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.ID
 					}
-					err = json.Unmarshal(s, &nameSlot)
-					if err != nil {
-						fmt.Print("can not unmarshal new value")
+				}
+			}
+			for key := range alexaResponse.Request.Intent.Slots {
+				var newSlot Slot
+				s, err := json.Marshal(alexaResponse.Request.Intent.Slots[key])
+				if err != nil {
+					fmt.Print("can not marshal")
+				}
+				err = json.Unmarshal(s, &newSlot)
+				if err != nil {
+					fmt.Print("can not unmarshal new value")
+				}
+				if newSlot.Resolutions != nil {
+					switch key {
+					case "intsl_sw_people_height":
+						swapiInfo := getSwapi(SwapiInfoID, key)
+						response := fmt.Sprintf("la taille de %s est de %s centimetres", SwapiInfoName, swapiInfo)
+						alexaResponseByte := buildIntentResponse(response)
+						w.Write(alexaResponseByte)
+						/*_, err = w.Write(alexaResponseByte)
+						if err == nil {
+							SwapiInfoName = ""
+							SwapiInfoID = ""
+						}*/
+					case "intsl_sw_people_birthdate":
+						swapiInfo := getSwapi(SwapiInfoID, key)
+						response := fmt.Sprintf("l'année de naissance de %s est %s", SwapiInfoName, swapiInfo)
+						alexaResponseByte := buildIntentResponse(response)
+						w.Write(alexaResponseByte)
+						/*_, err = w.Write(alexaResponseByte)
+						if err == nil {
+							SwapiInfoName = ""
+							SwapiInfoID = ""
+						}*/
+					case "intsl_sw_people_haircolor":
+						swapiInfo := getSwapi(SwapiInfoID, key)
+						switch swapiInfo {
+						case "n/a":
+							response := fmt.Sprintf("Les droids n'ont pas de cheveux")
+							alexaResponseByte := buildIntentResponse(response)
+							w.Write(alexaResponseByte)
+						case "brown":
+							response := fmt.Sprintf("les cheveux de %s sont brun", SwapiInfoName)
+							alexaResponseByte := buildIntentResponse(response)
+							w.Write(alexaResponseByte)
+
+						case "blond":
+							response := fmt.Sprintf("les cheveux de %s sont %s", SwapiInfoName, swapiInfo)
+							alexaResponseByte := buildIntentResponse(response)
+							w.Write(alexaResponseByte)
+
+						}
+						/*_, err = w.Write(alexaResponseByte)
+						if err == nil {
+							SwapiInfoName = ""
+							SwapiInfoID = ""
+						}*/
+
 					}
-					SwapiInfoName = nameSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.Name
-					SwapiInfoID = nameSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.ID
-
-				} else if newSlot.Resolutions != nil && key == "intsl_sw_people_height" {
-
-					swapiInfo := getSwapi(SwapiInfoID, key)
-					response := fmt.Sprintf("la taille de %s est de %s", SwapiInfoName, swapiInfo)
-					alexaResponseByte := buildIntentResponse(response)
-					w.Write(alexaResponseByte)
-				} else if newSlot.Resolutions != nil && key == "intsl_sw_people_birthdate" {
-
-					swapiInfo := getSwapi(SwapiInfoID, key)
-					response := fmt.Sprintf("l'année de naissance de %s est %s", SwapiInfoName, swapiInfo)
-					alexaResponseByte := buildIntentResponse(response)
-					w.Write(alexaResponseByte)
-				} else if newSlot.Resolutions != nil && key == "intsl_sw_people_haircolor" {
-
-					swapiInfo := getSwapi(SwapiInfoID, key)
-					response := fmt.Sprintf("les cheveux de %s sont %s", SwapiInfoName, swapiInfo)
-					alexaResponseByte := buildIntentResponse(response)
-					w.Write(alexaResponseByte)
 				}
 			}
 		}

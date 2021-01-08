@@ -47,21 +47,36 @@ func buildIntentResponse(response string) (alexaResponseByte []byte) {
 	return alexaResponseByte
 }
 
+func alexaSlotParsing(slots interface{}) (newSlot slot) {
+	slotBytes, err := json.Marshal(slots)
+	if err != nil {
+		fmt.Print("cannot marshal new slot")
+	}
+	err = json.Unmarshal(slotBytes, &newSlot)
+	if err != nil {
+		fmt.Print("cannot unmarshal new value")
+	}
+	return newSlot
+}
+
+func getSlotPeople(alexaResponse backendResponse) (id, name string) {
+	nameSlot := alexaSlotParsing(alexaResponse.Request.Intent.Slots["intsl_sw_people_name"])
+	name = nameSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.Name
+	id = nameSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.ID
+	return id, name
+}
+
 func helloAlexa(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Print(err)
 	}
-
 	var alexaResponse backendResponse
-	var swapiInfoName, swapiInfoID string
-
 	err = json.Unmarshal(body, &alexaResponse)
 	if err != nil {
 		log.Print(err)
 	}
-
 	switch alexaResponse.Request.Type {
 	case "LaunchRequest":
 		response := "Holo disque initialisé"
@@ -69,23 +84,12 @@ func helloAlexa(w http.ResponseWriter, r *http.Request) {
 		w.Write(alexaResponseByte)
 	case "IntentRequest":
 		if alexaResponse.Request.Intent.Name == "int_sw_people" {
-
+			swapiInfoID, swapiInfoName := getSlotPeople(alexaResponse)
 			for key := range alexaResponse.Request.Intent.Slots {
-				var newSlot slot
-				slotBytes, err := json.Marshal(alexaResponse.Request.Intent.Slots[key])
-				if err != nil {
-					fmt.Print("cannot marshal new slot")
-				}
-				err = json.Unmarshal(slotBytes, &newSlot)
-				if err != nil {
-					fmt.Print("cannot unmarshal new value")
-				}
+				newSlot := alexaSlotParsing(alexaResponse.Request.Intent.Slots[key])
 				if newSlot.Resolutions != nil {
 					switch key {
 					case "intsl_sw_people_name":
-						swapiInfoName = newSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.Name
-						swapiInfoID = newSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.ID
-						fallthrough
 					case "intsl_sw_people_height":
 						swapiInfo := getSwapi(swapiInfoID, key)
 						response := fmt.Sprintf("la taille de %s est de %s centimetres", swapiInfoName, swapiInfo)
@@ -138,5 +142,4 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 }

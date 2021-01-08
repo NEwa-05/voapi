@@ -12,8 +12,6 @@ type prevresp struct {
 	Text string `json:"text"`
 }
 
-// alexa response
-
 type backendResponse struct {
 	Version           string `json:"version"`
 	SessionAttributes struct {
@@ -32,9 +30,9 @@ type backendResponse struct {
 		Timestamp   string  `json:"timestamp,omitempty"`
 		DialogState string  `json:"dialogState,omitempty"`
 		Locale      string  `json:"locale,omitempty"`
-		Intent      *Intent `json:"intent,omitempty"`
+		Intent      *intent `json:"intent,omitempty"`
 		Reason      string  `json:"reason,omitempty"`
-		Error       *Error  `json:"error,omitempty"`
+		Error       *error  `json:"error,omitempty"`
 	} `json:"request"`
 }
 
@@ -62,58 +60,49 @@ type card struct {
 	} `json:"image,omitempty"`
 }
 
-//Intent struct
-type Intent struct {
+type intent struct {
 	Name               string                 `json:"name"`
 	ConfirmationStatus string                 `json:"confirmationStatus,omitempty"`
 	Slots              map[string]interface{} `json:"slots,omitempty"`
 }
 
-//Slot struct
-type Slot struct {
+type slot struct {
 	ConfirmationStatus string       `json:"confirmationStatus,omitempty"`
 	Name               string       `json:"name,omitempty"`
-	Resolutions        *Resolutions `json:"resolutions,omitempty"`
+	Resolutions        *resolutions `json:"resolutions,omitempty"`
 }
 
-//SlotName struct
-type SlotName struct {
+type slotName struct {
 	Name               string       `json:"name,omitempty"`
 	Value              string       `json:"value,omitempty"`
 	ConfirmationStatus string       `json:"confirmationStatus,omitempty"`
-	Resolutions        *Resolutions `json:"resolutions,omitempty"`
+	Resolutions        *resolutions `json:"resolutions,omitempty"`
 }
 
-//Resolutions struct
-type Resolutions struct {
-	ResolutionsPerAuthority []*ResolutionsPerAuthority `json:"resolutionsPerAuthority,omitempty"`
+type resolutions struct {
+	ResolutionsPerAuthority []*resolutionsPerAuthority `json:"resolutionsPerAuthority,omitempty"`
 }
 
-//ResolutionsPerAuthority struct
-type ResolutionsPerAuthority struct {
+type resolutionsPerAuthority struct {
 	Authority string    `json:"authority,omitempty"`
-	Status    *Status   `json:"status,omitempty"`
-	Values    []*Values `json:"values,omitempty"`
+	Status    *status   `json:"status,omitempty"`
+	Values    []*values `json:"values,omitempty"`
 }
 
-//Status struct
-type Status struct {
+type status struct {
 	Code string `json:"code,omitempty"`
 }
 
-//Values struct
-type Values struct {
-	Value *Value `json:"value,omitempty"`
+type values struct {
+	Value *value `json:"value,omitempty"`
 }
 
-//Value Struct
-type Value struct {
+type value struct {
 	Name string `json:"name,omitempty"`
 	ID   string `json:"id,omitempty"`
 }
 
-// Error struct
-type Error struct {
+type error struct {
 	Type    string `json:"type,omitempty"`
 	Message string `json:"message,omitempty"`
 }

@@ -10,12 +10,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//SwapiInfoID ...
-var SwapiInfoID string
-
-//SwapiInfoName ...
-var SwapiInfoName string
-
 func getSwapi(id, caracteristic string) (result string) {
 	var peopleSearchInfo People
 	swapiSearch, err := http.Get("https://swapi.dev/api/people/" + id)
@@ -54,89 +48,80 @@ func buildIntentResponse(response string) (alexaResponseByte []byte) {
 }
 
 func helloAlexa(w http.ResponseWriter, r *http.Request) {
-	// return content-type as json
 	w.Header().Set("Content-Type", "application/json")
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Print(err)
 	}
+
 	var alexaResponse backendResponse
+	var swapiInfoName, swapiInfoID string
+
 	err = json.Unmarshal(body, &alexaResponse)
 	if err != nil {
 		log.Print(err)
 	}
-	if alexaResponse.Request.Type == "LaunchRequest" {
+
+	switch alexaResponse.Request.Type {
+	case "LaunchRequest":
 		response := "Holo disque initialisé"
 		alexaResponseByte := buildIntentResponse(response)
 		w.Write(alexaResponseByte)
-	} else if alexaResponse.Request.Type == "IntentRequest" {
+	case "IntentRequest":
 		if alexaResponse.Request.Intent.Name == "int_sw_people" {
 
 			for key := range alexaResponse.Request.Intent.Slots {
-				var newSlot Slot
-				s, err := json.Marshal(alexaResponse.Request.Intent.Slots[key])
+				var newSlot slot
+				slotBytes, err := json.Marshal(alexaResponse.Request.Intent.Slots[key])
 				if err != nil {
-					fmt.Print("can not marshal")
+					fmt.Print("cannot marshal new slot")
 				}
-				err = json.Unmarshal(s, &newSlot)
+				err = json.Unmarshal(slotBytes, &newSlot)
 				if err != nil {
-					fmt.Print("can not unmarshal new value")
-				}
-				if newSlot.Resolutions != nil {
-					if key == "intsl_sw_people_name" {
-						SwapiInfoName = newSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.Name
-						SwapiInfoID = newSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.ID
-					}
-				}
-			}
-			for key := range alexaResponse.Request.Intent.Slots {
-				var newSlot Slot
-				s, err := json.Marshal(alexaResponse.Request.Intent.Slots[key])
-				if err != nil {
-					fmt.Print("can not marshal")
-				}
-				err = json.Unmarshal(s, &newSlot)
-				if err != nil {
-					fmt.Print("can not unmarshal new value")
+					fmt.Print("cannot unmarshal new value")
 				}
 				if newSlot.Resolutions != nil {
 					switch key {
+					case "intsl_sw_people_name":
+						swapiInfoName = newSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.Name
+						swapiInfoID = newSlot.Resolutions.ResolutionsPerAuthority[0].Values[0].Value.ID
+						fallthrough
 					case "intsl_sw_people_height":
-						swapiInfo := getSwapi(SwapiInfoID, key)
-						response := fmt.Sprintf("la taille de %s est de %s centimetres", SwapiInfoName, swapiInfo)
+						swapiInfo := getSwapi(swapiInfoID, key)
+						response := fmt.Sprintf("la taille de %s est de %s centimetres", swapiInfoName, swapiInfo)
 						alexaResponseByte := buildIntentResponse(response)
 						w.Write(alexaResponseByte)
 					case "intsl_sw_people_birthdate":
-						swapiInfo := getSwapi(SwapiInfoID, key)
-						response := fmt.Sprintf("l'année de naissance de %s est %s", SwapiInfoName, swapiInfo)
+						swapiInfo := getSwapi(swapiInfoID, key)
+						response := fmt.Sprintf("l'année de naissance de %s est %s", swapiInfoName, swapiInfo)
 						alexaResponseByte := buildIntentResponse(response)
 						w.Write(alexaResponseByte)
 					case "intsl_sw_people_haircolor":
-						swapiInfo := getSwapi(SwapiInfoID, key)
+						swapiInfo := getSwapi(swapiInfoID, key)
 						switch swapiInfo {
 						case "brown":
-							response := fmt.Sprintf("les cheveux de %s sont bruns", SwapiInfoName)
+							response := fmt.Sprintf("les cheveux de %s sont bruns", swapiInfoName)
 							alexaResponseByte := buildIntentResponse(response)
 							w.Write(alexaResponseByte)
 						case "blond":
-							response := fmt.Sprintf("les cheveux de %s sont blonds", SwapiInfoName)
+							response := fmt.Sprintf("les cheveux de %s sont blonds", swapiInfoName)
 							alexaResponseByte := buildIntentResponse(response)
 							w.Write(alexaResponseByte)
 						case "red":
-							response := fmt.Sprintf("les cheveux de %s sont roux", SwapiInfoName)
+							response := fmt.Sprintf("les cheveux de %s sont roux", swapiInfoName)
 							alexaResponseByte := buildIntentResponse(response)
 							w.Write(alexaResponseByte)
 						case "none":
-							response := fmt.Sprintf("%s n'a pas de cheveux sur le caillou", SwapiInfoName)
+							response := fmt.Sprintf("%s n'a pas de cheveux sur le caillou", swapiInfoName)
 							alexaResponseByte := buildIntentResponse(response)
 							w.Write(alexaResponseByte)
 						default:
-							response := fmt.Sprintf("aucune info sur les cheveux de %s", SwapiInfoName)
+							response := fmt.Sprintf("aucune info sur les cheveux de %s", swapiInfoName)
 							alexaResponseByte := buildIntentResponse(response)
 							w.Write(alexaResponseByte)
 						}
 					default:
-						response := fmt.Sprintf("Je ne connais pas cette information à propos de %s", SwapiInfoName)
+						response := fmt.Sprintf("Je ne connais pas cette information à propos de %s", swapiInfoName)
 						alexaResponseByte := buildIntentResponse(response)
 						w.Write(alexaResponseByte)
 					}
